@@ -1,0 +1,14 @@
+<div *ngIf="loading">Loading...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<div *ngIf="course">
+  <h2>{{ course.title }}</h2>
+  <p><strong>Description:</strong> {{ course.description || '-' }}</p>
+  <p><strong>Duration:</strong> {{ course.duration }} minutes</p>
+  <p><strong>Status:</strong> {{ course.status }}</p>
+  <p><strong>Created at:</strong> {{ course.createdAt | date:'medium' }}</p>
+  <p *ngIf="course.publishedAt"><strong>Published at:</strong> {{ course.publishedAt | date:'medium' }}</p>
+
+  <button (click)="backToList()">Back to list</button>
+  <button (click)="router.navigate(['/courses', course.id, 'edit'])" [disabled]="course.status === 'ARCHIVED'">Edit</button>
+</div>
