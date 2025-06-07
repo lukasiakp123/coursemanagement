@@ -1,5 +1,16 @@
 <h2>Courses</h2>
 
+<div *ngIf="toastMessage" [ngClass]="{'toast-success': toastType==='success', 'toast-error': toastType==='error'}" class="toast">
+  {{ toastMessage }}
+</div>
+
+<div class="button-bar">
+  <button (click)="getAverageDuration()">Get Average Duration</button>
+  <span *ngIf="averageDuration !== undefined">
+    | Average Duration: {{ averageDuration | number:'1.0-2' }} min
+  </span>
+</div>
+
 <div class="filter-container">
   <label for="statusFilter">Filter by Status:</label>
   <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()">
@@ -30,7 +41,7 @@
     </td>
     <td>{{ course.duration }}</td>
     <td>{{ course.status }}</td>
-    <td>
+    <td class="published-date">
       {{ course.status === 'PUBLISHED' ? (course.publishedAt | date: 'yyyy-MM-dd HH:mm:ss') : '' }}
     </td>
     <td>
@@ -38,6 +49,7 @@
       <button (click)="archiveCourse(course.id)" [disabled]="course.status !== 'PUBLISHED'">Archive</button>
       <button (click)="router.navigate(['/courses', course.id, 'edit'])" [disabled]="course.status === 'ARCHIVED'">Edit</button>
       <button (click)="deleteCourse(course.id)">Delete</button>
+      <button (click)="duplicateCourse(course.id)">Duplicate</button>
     </td>
   </tr>
   </tbody>

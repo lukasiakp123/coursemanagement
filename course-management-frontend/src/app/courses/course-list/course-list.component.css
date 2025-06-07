@@ -5,6 +5,28 @@
   font-family: Arial, sans-serif;
 }
 
+.table td {
+  white-space: nowrap;
+}
+
+.table .published-date {
+  white-space: nowrap;
+}
+
+
+
+.table .action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.table .action-buttons button {
+  font-size: 0.8rem;
+  padding: 4px 6px;
+  white-space: nowrap;
+}
+
 .table th, .table td {
   border: 1px solid #ddd;
   padding: 8px;
@@ -19,10 +41,16 @@
   margin-bottom: 1rem;
 }
 
-.loading, .error, .no-data {
+.error, .no-data {
   margin-top: 1rem;
   font-weight: bold;
   color: #b00;
+}
+
+.loading, .error, .no-data {
+  margin-top: 1rem;
+  font-weight: bold;
+  color: rgba(187, 150, 0, 0.16);
 }
 
 .pagination-controls {
@@ -31,3 +59,28 @@
   gap: 1rem;
   align-items: center;
 }
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+.toast-success {
+  background-color: #4CAF50;
+}
+
+.toast-error {
+  background-color: #f44336;
+}
+
+.button-bar {
+  margin-bottom: 12px;
+}
+
+

@@ -18,6 +18,15 @@ export class CourseListComponent implements OnInit {
   totalPages = 0;
   totalElements = 0;
   statusFilter: string = 'ALL';
+  averageDuration?: number;
+  toastMessage = '';
+  toastType: 'success' | 'error' = 'success';
+
+  showToast(message: string, type: 'success' | 'error' = 'success') {
+    this.toastMessage = message;
+    this.toastType = type;
+    setTimeout(() => this.toastMessage = '', 3000);
+  }
 
   constructor(private courseService: CourseService, protected router: Router) { }
 
@@ -81,4 +90,29 @@ export class CourseListComponent implements OnInit {
   hasPublished(): boolean {
     return this.courses.some(course => course.status === 'PUBLISHED');
   }
+
+  getAverageDuration() {
+    this.courseService.getAverageDuration().subscribe({
+      next: avg => {
+        this.averageDuration = avg;
+        this.showToast(`Average duration: ${avg.toFixed(2)} min`, 'success');
+      },
+      error: () => {
+        this.showToast('Failed to fetch average duration', 'error');
+      }
+    });
+  }
+
+  duplicateCourse(id: number) {
+    this.courseService.duplicate(id).subscribe({
+      next: () => {
+        this.showToast('Course duplicated successfully', 'success');
+        this.loadCourses();
+      },
+      error: () => {
+        this.showToast('Failed to duplicate course', 'error');
+      }
+    });
+  }
+
 }

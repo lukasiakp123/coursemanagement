@@ -47,4 +47,13 @@ export class CourseService {
   archive(id: number): Observable<Course> {
     return this.http.post<Course>(`${this.apiUrl}/${id}/archive`, {});
   }
+
+  getAverageDuration() {
+    return this.http.get<number>(`${this.apiUrl}/average-duration`);
+  }
+
+  duplicate(id: number) {
+    return this.http.post<Course>(`${this.apiUrl}/${id}/duplicate`, {});
+  }
+
 }
