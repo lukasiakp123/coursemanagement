@@ -10,6 +10,10 @@ import org.algoteque.coursemanagement.mapper.CourseMapper;
 import org.algoteque.coursemanagement.repository.CourseQueryRepository;
 import org.algoteque.coursemanagement.repository.CourseRepository;
 import org.algoteque.coursemanagement.validation.CourseValidator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,8 +30,12 @@ public class CourseService {
     private final CourseMapper mapper;
     private final CourseValidator validator;
 
-    public List<CourseResponseDto> findAll() {
-        return queryRepository.findAllAsDto();
+    public Page<CourseResponseDto> findAll(int page, int size, CourseStatus status) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Course> courses = (status != null)
+                ? repository.findAllByStatus(status, pageable)
+                : repository.findAll(pageable);
+        return courses.map(mapper::toDto);
     }
 
     public CourseResponseDto findById(Long id) {

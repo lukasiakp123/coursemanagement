@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.algoteque.coursemanagement.domain.CourseStatus;
 import org.algoteque.coursemanagement.dto.CourseRequestDto;
 import org.algoteque.coursemanagement.dto.CourseResponseDto;
 import org.algoteque.coursemanagement.service.CourseService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +30,13 @@ public class CourseController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all courses", description = "Returns a list of all available courses")
-    public List<CourseResponseDto> all() {
-        return service.findAll();
+    @Operation(summary = "Get all courses", description = "Returns a list of courses with optional status filter and pagination")
+    public Page<CourseResponseDto> all(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) CourseStatus status
+    ) {
+        return service.findAll(page, size, status);
     }
 
     @GetMapping("/{id}")

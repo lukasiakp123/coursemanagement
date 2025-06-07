@@ -11,13 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -39,6 +40,8 @@ class CourseControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        repository.deleteAll();
+
         draftCourse = Course.customBuilder()
                 .title("Java Basics")
                 .description("Intro to Java")
@@ -53,7 +56,7 @@ class CourseControllerIntegrationTest {
     void shouldGetAllCourses() throws Exception {
         mockMvc.perform(get("/api/courses"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Java Basics"));
+                .andExpect(jsonPath("$.content[0].title").value("Java Basics"));
     }
 
     @Test
@@ -170,4 +173,75 @@ class CourseControllerIntegrationTest {
                 .andExpect(jsonPath("$.publishedAt").doesNotExist());
     }
 
+    @Test
+    void shouldReturnCoursesWithStatusFilter() throws Exception {
+        repository.deleteAll();
+
+        Course draft = repository.save(Course.customBuilder()
+                .title("Draft Course").description("desc").duration(5)
+                .status(CourseStatus.DRAFT).createdAt(LocalDateTime.now()).build());
+
+        Course published = repository.save(Course.customBuilder()
+                .title("Published Course").description("desc").duration(5)
+                .status(CourseStatus.PUBLISHED).createdAt(LocalDateTime.now()).build());
+
+        mockMvc.perform(get("/api/courses")
+                        .param("status", "DRAFT")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title").value("Draft Course"))
+                .andExpect(jsonPath("$.content[0].status").value("DRAFT"));
+    }
+
+    @Test
+    void shouldReturnPagedCourses() throws Exception {
+        repository.deleteAll();
+
+        for (int i = 1; i <= 15; i++) {
+            repository.save(Course.customBuilder()
+                    .title("Course " + i).description("desc").duration(5)
+                    .status(CourseStatus.DRAFT).createdAt(LocalDateTime.now()).build());
+        }
+
+        mockMvc.perform(get("/api/courses")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(5)))
+                .andExpect(jsonPath("$.totalElements").value(15))
+                .andExpect(jsonPath("$.totalPages").value(3));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoCourses() throws Exception {
+        repository.deleteAll();
+
+        mockMvc.perform(get("/api/courses")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(0)))
+                .andExpect(jsonPath("$.totalElements").value(0))
+                .andExpect(jsonPath("$.totalPages").value(0));
+    }
+
+    @Test
+    void shouldReturnBadRequestForInvalidStatus() throws Exception {
+        mockMvc.perform(get("/api/courses")
+                        .param("status", "INVALID_STATUS")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestForNegativePage() throws Exception {
+        mockMvc.perform(get("/api/courses")
+                        .param("page", "-1")
+                        .param("size", "5")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

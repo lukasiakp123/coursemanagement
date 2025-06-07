@@ -14,8 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -69,6 +72,21 @@ class CourseServiceTest {
 
         assertThat(result.id()).isEqualTo(1L);
     }
+
+    @Test
+    void shouldReturnCoursesByStatusAndPage() {
+        Course course = Course.customBuilder().title("Test").status(CourseStatus.DRAFT).build();
+        Page<Course> page = new PageImpl<>(List.of(course));
+
+        when(repository.findAllByStatus(eq(CourseStatus.DRAFT), any())).thenReturn(page);
+        when(mapper.toDto(any())).thenReturn(CourseResponseDto.builder().title("Test").status(CourseStatus.DRAFT).build());
+
+        Page<CourseResponseDto> result = service.findAll(0, 10, CourseStatus.DRAFT);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).status()).isEqualTo(CourseStatus.DRAFT);
+    }
+
 
     @Test
     void shouldThrowWhenCourseNotFound() {
