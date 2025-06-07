@@ -1,28 +1,30 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {Course, CoursePage, CourseStatus} from '../models/course.model';
-import {environment} from "../../environments/environment";
+import { Course, CoursePage } from '../models/course.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CourseService {
-
   private apiUrl = `${environment.apiUrl}/courses`;
 
-  constructor(private http: HttpClient) { }
+  http = inject(HttpClient);
 
-  getAll(page: number = 0, size: number = 10, status?: string): Observable<CoursePage> {
-    const params: any = {
-      page,
-      size
-    };
+
+  getAll(page = 0, size = 10, status?: string): Observable<CoursePage> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
     if (status && status !== 'ALL') {
-      params.status = status;
+      params = params.set('status', status);
     }
+
     return this.http.get<CoursePage>(this.apiUrl, { params });
   }
+
 
   getById(id: number): Observable<Course> {
     return this.http.get<Course>(`${this.apiUrl}/${id}`);
@@ -55,5 +57,4 @@ export class CourseService {
   duplicate(id: number) {
     return this.http.post<Course>(`${this.apiUrl}/${id}/duplicate`, {});
   }
-
 }

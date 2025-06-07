@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import { CourseService } from '../../services/course.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Course } from '../../models/course.model';
@@ -6,19 +6,17 @@ import { Course } from '../../models/course.model';
 @Component({
   selector: 'app-course-detail',
   templateUrl: './course-detail.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CourseDetailComponent implements OnInit {
-
   course!: Course | null;
   loading = false;
   error = '';
 
-  constructor(
-    private courseService: CourseService,
-    private route: ActivatedRoute,
-    protected router: Router
-  ) { }
+  courseService = inject(CourseService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+
 
   ngOnInit(): void {
     this.loadCourse();
@@ -35,7 +33,7 @@ export class CourseDetailComponent implements OnInit {
       error: () => {
         this.error = 'Failed to load course';
         this.loading = false;
-      }
+      },
     });
   }
 

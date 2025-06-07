@@ -1,7 +1,7 @@
 export enum CourseStatus {
   DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
-  ARCHIVED = 'ARCHIVED'
+  ARCHIVED = 'ARCHIVED',
 }
 
 export interface Course {

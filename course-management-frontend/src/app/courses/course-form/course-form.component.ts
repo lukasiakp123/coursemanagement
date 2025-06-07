@@ -1,37 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CourseService } from '../../services/course.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Course } from '../../models/course.model';
 
 @Component({
   selector: 'app-course-form',
   templateUrl: './course-form.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CourseFormComponent implements OnInit {
-
   courseForm!: FormGroup;
   isEditMode = false;
   courseId!: number;
   loading = false;
   error = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private courseService: CourseService,
-    private route: ActivatedRoute,
-    protected router: Router
-  ) { }
+  fb = inject(FormBuilder);
+  courseService = inject(CourseService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
 
   ngOnInit(): void {
     this.courseForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
-      duration: [1, [Validators.required, Validators.min(1)]]
+      duration: [1, [Validators.required, Validators.min(1)]],
     });
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
         this.isEditMode = true;
@@ -48,14 +44,14 @@ export class CourseFormComponent implements OnInit {
         this.courseForm.patchValue({
           title: course.title,
           description: course.description,
-          duration: course.duration
+          duration: course.duration,
         });
         this.loading = false;
       },
       error: () => {
         this.error = 'Failed to load course';
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -71,7 +67,7 @@ export class CourseFormComponent implements OnInit {
         error: () => {
           this.error = 'Failed to update course';
           this.loading = false;
-        }
+        },
       });
     } else {
       this.courseService.create(courseData).subscribe({
@@ -79,7 +75,7 @@ export class CourseFormComponent implements OnInit {
         error: () => {
           this.error = 'Failed to create course';
           this.loading = false;
-        }
+        },
       });
     }
   }

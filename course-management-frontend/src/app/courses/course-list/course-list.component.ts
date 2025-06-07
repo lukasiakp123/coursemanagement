@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import { Course } from '../../models/course.model';
 import { CourseService } from '../../services/course.service';
 import { Router } from '@angular/router';
@@ -6,10 +6,9 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-course-list',
   templateUrl: './course-list.component.html',
-  styleUrls: ['course-list.component.css']
+  styleUrls: ['course-list.component.css'],
 })
 export class CourseListComponent implements OnInit {
-
   courses: Course[] = [];
   loading = false;
   error = '';
@@ -17,7 +16,7 @@ export class CourseListComponent implements OnInit {
   pageSize = 3;
   totalPages = 0;
   totalElements = 0;
-  statusFilter: string = 'ALL';
+  statusFilter = 'ALL';
   averageDuration?: number;
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
@@ -25,10 +24,11 @@ export class CourseListComponent implements OnInit {
   showToast(message: string, type: 'success' | 'error' = 'success') {
     this.toastMessage = message;
     this.toastType = type;
-    setTimeout(() => this.toastMessage = '', 3000);
+    setTimeout(() => (this.toastMessage = ''), 3000);
   }
 
-  constructor(private courseService: CourseService, protected router: Router) { }
+  courseService = inject(CourseService);
+  router = inject(Router);
 
   ngOnInit(): void {
     this.loadCourses();
@@ -37,7 +37,7 @@ export class CourseListComponent implements OnInit {
   loadCourses() {
     this.loading = true;
     this.courseService.getAll(this.pageNumber, this.pageSize, this.statusFilter).subscribe({
-      next: data => {
+      next: (data) => {
         this.courses = data.content;
         this.pageNumber = data.number;
         this.pageSize = data.size;
@@ -45,10 +45,10 @@ export class CourseListComponent implements OnInit {
         this.totalElements = data.totalElements;
         this.loading = false;
       },
-      error: err => {
+      error: () => {
         this.error = 'Failed to load courses';
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -56,7 +56,7 @@ export class CourseListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this course?')) {
       this.courseService.delete(id).subscribe({
         next: () => this.loadCourses(),
-        error: () => alert('Failed to delete course')
+        error: () => alert('Failed to delete course'),
       });
     }
   }
@@ -64,14 +64,14 @@ export class CourseListComponent implements OnInit {
   publishCourse(id: number) {
     this.courseService.publish(id).subscribe({
       next: () => this.loadCourses(),
-      error: () => alert('Failed to publish course')
+      error: () => alert('Failed to publish course'),
     });
   }
 
   archiveCourse(id: number) {
     this.courseService.archive(id).subscribe({
       next: () => this.loadCourses(),
-      error: () => alert('Failed to archive course')
+      error: () => alert('Failed to archive course'),
     });
   }
 
@@ -88,18 +88,18 @@ export class CourseListComponent implements OnInit {
   }
 
   hasPublished(): boolean {
-    return this.courses.some(course => course.status === 'PUBLISHED');
+    return this.courses.some((course) => course.status === 'PUBLISHED');
   }
 
   getAverageDuration() {
     this.courseService.getAverageDuration().subscribe({
-      next: avg => {
+      next: (avg) => {
         this.averageDuration = avg;
         this.showToast(`Average duration: ${avg.toFixed(2)} min`, 'success');
       },
       error: () => {
         this.showToast('Failed to fetch average duration', 'error');
-      }
+      },
     });
   }
 
@@ -111,8 +111,7 @@ export class CourseListComponent implements OnInit {
       },
       error: () => {
         this.showToast('Failed to duplicate course', 'error');
-      }
+      },
     });
   }
-
 }
