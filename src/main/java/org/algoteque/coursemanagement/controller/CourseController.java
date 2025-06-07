@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.algoteque.coursemanagement.domain.CourseStatus;
 import org.algoteque.coursemanagement.dto.CourseRequestDto;
 import org.algoteque.coursemanagement.dto.CourseResponseDto;
+import org.algoteque.coursemanagement.dto.PagedResponseDto;
 import org.algoteque.coursemanagement.service.CourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -30,13 +31,26 @@ public class CourseController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all courses", description = "Returns a list of courses with optional status filter and pagination")
-    public Page<CourseResponseDto> all(
+    @Operation(
+            summary = "Get all courses",
+            description = "Returns a paginated list of courses. You can optionally filter by status (DRAFT, PUBLISHED, ARCHIVED)."
+    )
+    @Parameter(name = "status", description = "Filter by course status")
+    @Parameter(name = "page", description = "Page number (zero-based)")
+    @Parameter(name = "size", description = "Number of items per page")
+    public PagedResponseDto<CourseResponseDto> all(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) CourseStatus status
     ) {
-        return service.findAll(page, size, status);
+        Page<CourseResponseDto> result = service.findAll(page, size, status);
+        return new PagedResponseDto<>(
+                result.getContent(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages()
+        );
     }
 
     @GetMapping("/{id}")

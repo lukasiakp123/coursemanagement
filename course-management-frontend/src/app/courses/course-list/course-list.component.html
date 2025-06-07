@@ -1,5 +1,15 @@
 <h2>Courses</h2>
 
+<div class="filter-container">
+  <label for="statusFilter">Filter by Status:</label>
+  <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+    <option value="ALL">All</option>
+    <option value="DRAFT">Draft</option>
+    <option value="PUBLISHED">Published</option>
+    <option value="ARCHIVED">Archived</option>
+  </select>
+</div>
+
 <div *ngIf="loading">Loading...</div>
 <div *ngIf="error" class="error">{{ error }}</div>
 
@@ -30,3 +40,9 @@
 </table>
 
 <div *ngIf="!loading && courses.length === 0">No courses available.</div>
+
+<div class="pagination-controls" *ngIf="totalPages > 1">
+  <button (click)="changePage(pageNumber - 1)" [disabled]="pageNumber === 0">Previous</button>
+  <span>Page {{ pageNumber + 1 }} of {{ totalPages }}</span>
+  <button (click)="changePage(pageNumber + 1)" [disabled]="pageNumber + 1 >= totalPages">Next</button>
+</div>

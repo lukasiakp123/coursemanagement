@@ -13,6 +13,11 @@ export class CourseListComponent implements OnInit {
   courses: Course[] = [];
   loading = false;
   error = '';
+  pageNumber = 0;
+  pageSize = 3;
+  totalPages = 0;
+  totalElements = 0;
+  statusFilter: string = 'ALL';
 
   constructor(private courseService: CourseService, protected router: Router) { }
 
@@ -22,9 +27,13 @@ export class CourseListComponent implements OnInit {
 
   loadCourses() {
     this.loading = true;
-    this.courseService.getAll().subscribe({
+    this.courseService.getAll(this.pageNumber, this.pageSize, this.statusFilter).subscribe({
       next: data => {
-        this.courses = data;
+        this.courses = data.content;
+        this.pageNumber = data.number;
+        this.pageSize = data.size;
+        this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
         this.loading = false;
       },
       error: err => {
@@ -55,5 +64,17 @@ export class CourseListComponent implements OnInit {
       next: () => this.loadCourses(),
       error: () => alert('Failed to archive course')
     });
+  }
+
+  changePage(newPage: number) {
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.pageNumber = newPage;
+      this.loadCourses();
+    }
+  }
+
+  onFilterChange() {
+    this.pageNumber = 0;
+    this.loadCourses();
   }
 }
