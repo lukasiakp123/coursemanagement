@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-course-list',
   templateUrl: './course-list.component.html',
-  styleUrls: []
+  styleUrls: ['course-list.component.css']
 })
 export class CourseListComponent implements OnInit {
 
@@ -76,5 +76,9 @@ export class CourseListComponent implements OnInit {
   onFilterChange() {
     this.pageNumber = 0;
     this.loadCourses();
+  }
+
+  hasPublished(): boolean {
+    return this.courses.some(course => course.status === 'PUBLISHED');
   }
 }

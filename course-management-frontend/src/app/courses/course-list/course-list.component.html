@@ -10,7 +10,7 @@
   </select>
 </div>
 
-<div *ngIf="loading">Loading...</div>
+<div *ngIf="loading" class="loading">Loading...</div>
 <div *ngIf="error" class="error">{{ error }}</div>
 
 <table *ngIf="!loading && courses.length > 0" class="table">
@@ -19,6 +19,7 @@
     <th>Title</th>
     <th>Duration (min)</th>
     <th>Status</th>
+    <th>Published At</th>
     <th>Actions</th>
   </tr>
   </thead>
@@ -30,6 +31,9 @@
     <td>{{ course.duration }}</td>
     <td>{{ course.status }}</td>
     <td>
+      {{ course.status === 'PUBLISHED' ? (course.publishedAt | date: 'yyyy-MM-dd HH:mm:ss') : '' }}
+    </td>
+    <td>
       <button (click)="publishCourse(course.id)" [disabled]="course.status !== 'DRAFT'">Publish</button>
       <button (click)="archiveCourse(course.id)" [disabled]="course.status !== 'PUBLISHED'">Archive</button>
       <button (click)="router.navigate(['/courses', course.id, 'edit'])" [disabled]="course.status === 'ARCHIVED'">Edit</button>
@@ -39,7 +43,7 @@
   </tbody>
 </table>
 
-<div *ngIf="!loading && courses.length === 0">No courses available.</div>
+<div *ngIf="!loading && courses.length === 0" class="no-data">No courses available.</div>
 
 <div class="pagination-controls" *ngIf="totalPages > 1">
   <button (click)="changePage(pageNumber - 1)" [disabled]="pageNumber === 0">Previous</button>
