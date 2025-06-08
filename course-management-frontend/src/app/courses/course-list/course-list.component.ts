@@ -13,7 +13,7 @@ export class CourseListComponent implements OnInit {
   loading = false;
   error = '';
   pageNumber = 0;
-  pageSize = 3;
+  pageSize = 10;
   totalPages = 0;
   totalElements = 0;
   statusFilter = 'ALL';
