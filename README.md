@@ -25,18 +25,18 @@ coursemanagement/
 - Maven 3.8+
 - PostgreSQL (optional – H2 in-memory for tests)
 
-#### ▶️ Run the backend - locally
+#### ▶️ Run the backend - locally  (powershell)
 
-```bash (powershell)
+```bash
 cd coursemanagement
 ./mvnw clean install
 ./mvnw spring-boot:run --% -Dspring-boot.run.profiles=dev
 
 ```
 
-#### ▶️ Run the backend - Dockerized
+#### ▶️ Run the backend - Dockerized  (powershell)
 
-```bash (powershell)
+```bash
 cd coursemanagement
 ./mvnw clean install
 cd .\docker\
@@ -58,7 +58,7 @@ http://localhost:8080/swagger-ui/index.html
 - Node.js (v20+ recommended)
 - Angular CLI
 
-#### ▶️ Run the frontend
+#### ▶️ Run the frontend (powershell)
 
 ```bash
 cd coursemanagement
